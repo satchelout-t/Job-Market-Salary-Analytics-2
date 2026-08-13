@@ -266,8 +266,8 @@ jupyter lab salary_analysis.ipynb
 
 Two notes before running:
 
-- The notebooks currently hardcode an absolute Windows path for the data directory. Update the
-  `BASE` variable near the top of `salary_analysis.ipynb` to point at your `data/` directory.
+- Both notebooks read from `data/` relative to the repository root, so start Jupyter from the
+  repository root and the paths resolve with no edits.
 - A full execution takes roughly 35 minutes, dominated by the Optuna study, CatBoost, and the
   stacking ensemble. The committed notebook already contains its outputs, so it can be read
   without being run.
