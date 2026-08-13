@@ -1,4 +1,4 @@
-# LinkedIn Job Postings — salary, remote status, and description clusters
+# LinkedIn Job Postings: salary, remote status, and description clusters
 
 Three supervised and unsupervised tasks on the 2023–2024 LinkedIn job postings dataset: salary
 regression (the main work), remote-vs-on-site classification, and clustering of job description
@@ -24,7 +24,7 @@ postings.csv              123,849 rows, one per job_id  ── the spine
     ├── companies.csv          one row per company
     ├── company_industries.csv
     ├── company_specialities.csv
-    └── employee_counts.csv    a time series — 1.46 snapshots per company
+    └── employee_counts.csv    a time series: 1.46 snapshots per company
 ```
 
 The one-to-many tables are the thing to be careful about. Merging `job_skills` onto `postings`
@@ -43,7 +43,7 @@ Salary is the bottleneck. Most postings do not disclose one:
  28,436  train / 7,110 test
 ```
 
-Within the salary table, `min`/`max` and `med` are mutually exclusive — a row carries either a
+Within the salary table, `min`/`max` and `med` are mutually exclusive: a row carries either a
 range or a midpoint, never both. The target uses `med_salary` where present and the midpoint of
 `min`/`max` otherwise, then annualises by pay period (hourly × 2080, monthly × 12, and so on).
 Skipping the midpoint fallback is the single most expensive mistake available here; see Task 1.
@@ -55,7 +55,7 @@ it, and place the contents in `data/` so the structure matches the tree above.
 
 ---
 
-## Task 1 — salary regression
+## Task 1: salary regression
 
 Target is `log1p(annual_salary)`. Errors are reported in dollars by applying `expm1` to both the
 prediction and the actual before subtracting.
@@ -92,7 +92,7 @@ RMSE are dollars.
 
 Best model is LightGBM tuned with Optuna. CV (0.664) and test (0.672) agree closely, so the
 result is not an overfit. The jump from linear (0.521) to trees (0.672) is large, which says
-there is real interaction structure — pay depends on seniority *within* an industry *within* a
+there is real interaction structure: pay depends on seniority *within* an industry *within* a
 state, not on those additively.
 
 ### On the R² of 0.672
@@ -106,7 +106,7 @@ recovers roughly four times the training data. Two company features (`company_si
 `follower_count`) are also populated here rather than silently arriving as all-NaN.
 
 More data and working features, not a better algorithm. Worth stating plainly, because a higher
-R² on the same public dataset invites the assumption that something leaked. The feature matrix is
+R� on the same public dataset invites the assumption that something leaked. The feature matrix is
 built from explicit allowlists containing no salary-derived column, and the close CV/test
 agreement is the other half of that check.
 
@@ -140,12 +140,12 @@ Top features by mean |SHAP|:
 
 Seniority dominates, which is unsurprising. Two of the top six are proxies rather than substance:
 `log_follower_count` is company prominence, and `desc_char_count` is description length. That
-`exp_missing` — the flag for postings that state no seniority at all — ranks sixth suggests
+`exp_missing`, the flag for postings that state no seniority at all, ranks sixth suggests
 non-disclosure of seniority is itself informative.
 
 ---
 
-## Task 2 — remote vs on-site
+## Task 2: remote vs on-site
 
 Binary classification over all 123,849 postings, not just the salary-disclosing subset. Salary is
 deliberately excluded as a feature; including it would restrict the model to the 29% that
@@ -161,7 +161,7 @@ disclose. The positive class is 12.3%.
 accuracy would look strong for a model that never identifies a single remote posting. ROC-AUC and
 PR-AUC are the numbers that move.
 
-Random forest and LightGBM are effectively tied — random forest leads ROC-AUC by 0.001, LightGBM
+Random forest and LightGBM are effectively tied: random forest leads ROC-AUC by 0.001, LightGBM
 leads PR-AUC by 0.005. Neither is meaningfully "the best".
 
 Thresholding at the F1-optimal point of **0.687** rather than the 0.5 default gives remote-class
@@ -174,7 +174,7 @@ LightGBM's, so the curve and the operating point match.*
 
 ---
 
-## Task 3 — description clusters
+## Task 3: description clusters
 
 TF-IDF over 24,770 job descriptions (a 20% sample), 20,000 terms, reduced to 100 components with
 truncated SVD (20.1% explained variance), then k-means.
@@ -183,7 +183,7 @@ truncated SVD (20.1% explained variance), then k-means.
 |---|---|---|---|---|---|
 | 0 | industrial / field service | 9,403 | $58,321 | 30% | 6% |
 | 1 | software & engineering | 5,850 | $124,800 | 30% | 21% |
-| 2 | "business owner / earnings" | 120 | — | 0% | 100% |
+| 2 | "business owner / earnings" | 120 | n/a | 0% | 100% |
 | 3 | sales, finance, marketing | 4,906 | $93,600 | 34% | 21% |
 | 4 | healthcare & nursing | 2,951 | $85,649 | 19% | 3% |
 | 5 | retail & store | 1,540 | $39,988 | 16% | 0% |
@@ -191,7 +191,7 @@ truncated SVD (20.1% explained variance), then k-means.
 ![Median pay by cluster](reports/figures/09_task3_cluster_median_pay.png)
 
 The clusters split by sector rather than by seniority, and there is a threefold spread in median
-pay between the top and bottom groups — from description text alone. That is a reasonable
+pay between the top and bottom groups, from description text alone. That is a reasonable
 indication that the descriptions carry salary signal the structural features never see. Feeding
 the SVD components back into Task 1 is the obvious next experiment.
 
@@ -210,7 +210,7 @@ Cluster 2 is 120 postings, **100% remote, zero with a disclosed salary**, with t
 `galt, earnings, credit, business, sales, personal, figure, memberships, business owners, saas`.
 
 That is recruitment spam, not a job family. It is small enough to ignore for this analysis, but it
-would need filtering before any of this went near production — and it is the kind of thing that
+would need filtering before any of this went near production, and it is the kind of thing that
 only surfaces by looking at cluster contents rather than at cluster metrics.
 
 ---
@@ -220,7 +220,7 @@ only surfaces by looking at cluster contents rather than at cluster metrics.
 These are real and worth reading before taking any number above at face value.
 
 **Disclosure selection bias.** The salary model trains on the 29% of postings that publish a
-figure. That is not a random sample — disclosure tracks pay-transparency legislation and tends
+figure. That is not a random sample: disclosure tracks pay-transparency legislation and tends
 toward larger employers. The model describes salary-disclosing postings, not the labour market.
 No amount of modelling fixes this; it is a property of the data.
 
@@ -232,7 +232,7 @@ is the standard correction if mean-unbiased dollar predictions are needed.
 
 **The R² ceiling is genuine.** The features available are structural: seniority, work type,
 industry, company size, coarse skill buckets, state. Pay is actually set by the specific role, the
-tech stack, the city rather than the state, the company's compensation band, and negotiation —
+tech stack, the city rather than the state, the company's compensation band, and negotiation:
 none of which is in this data. Roughly a quarter of postings do not even state a seniority level.
 More model capacity is not the missing ingredient.
 
@@ -247,7 +247,7 @@ README.md
 reports/
 ├── README_NUMBERS.md     every figure quoted above, extracted from notebook outputs
 └── figures/              exported plots (01–09)
-processed/                generated by preprocessing.ipynb — model_df / train / test CSVs
+processed/                generated by preprocessing.ipynb: model_df / train / test CSVs
 data/                     the Kaggle dataset (not committed)
 ```
 
