@@ -1,0 +1,17 @@
+# Versions are those the notebooks were executed with (Python 3.13.5).
+numpy==2.1.3
+pandas==2.2.3
+scipy==1.15.3
+scikit-learn==1.6.1
+
+matplotlib==3.10.0
+seaborn==0.13.2
+
+lightgbm==4.7.0
+xgboost==3.4.0
+catboost==1.2.10
+
+shap==0.52.0
+optuna==4.9.0
+
+jupyterlab

@@ -1,0 +1,32 @@
+# Raw dataset — download from Kaggle, not committed (~530 MB extracted)
+archive/
+data/
+*.zip
+
+# Generated artefacts
+processed/
+catboost_info/
+reports/figures/*.pdf
+
+# Data files of any kind, anywhere
+*.csv
+*.parquet
+*.feather
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
